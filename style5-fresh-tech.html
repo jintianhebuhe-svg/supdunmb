@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线路选择 - 清新科技风格</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #6c5ce7 100%);
+            color: #2d3436;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .routes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .route-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .route-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #74b9ff, #0984e3, #6c5ce7);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .route-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .route-number {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 25px;
+            box-shadow: 0 8px 20px rgba(116, 185, 255, 0.3);
+        }
+
+        .route-title {
+            font-size: 1.6rem;
+            color: #2d3436;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .route-description {
+            color: #636e72;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .route-button {
+            width: 100%;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+        }
+
+        .route-button:hover {
+            background: linear-gradient(135deg, #0984e3, #74b9ff);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(116, 185, 255, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 2.5rem; }
+            .routes-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">线路选择</h1>
+            <p class="subtitle">选择最适合您的连接线路</p>
+            <p class="description">我们提供多条高速稳定的线路，确保您获得最佳的连接体验。每条线路都经过精心优化，为您提供快速、安全、可靠的服务。</p>
+        </div>
+
+        <div class="routes-container">
+            <div class="route-card" onclick="selectRoute(1)">
+                <div class="route-number">1</div>
+                <h3 class="route-title">线路一</h3>
+                <p class="route-description">高速稳定，适合日常使用和轻度工作负载。提供优秀的性价比和可靠的连接质量。</p>
+                <button class="route-button">选择此线路</button>
+            </div>
+
+            <div class="route-card" onclick="selectRoute(2)">
+                <div class="route-number">2</div>
+                <h3 class="route-title">线路二</h3>
+                <p class="route-description">专业级性能，适合高负载应用和商业用途。提供卓越的速度和稳定性保障。</p>
+                <button class="route-button">选择此线路</button>
+            </div>
+
+            <div class="route-card" onclick="selectRoute(3)">
+                <div class="route-number">3</div>
+                <h3 class="route-title">线路三</h3>
+                <p class="route-description">企业级解决方案，适合大规模部署和关键业务应用。提供最高级别的性能和可靠性。</p>
+                <button class="route-button">选择此线路</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 科技发布页. 所有权利保留.</p>
+        </div>
+    </div>
+
+    <script>
+        function selectRoute(routeNumber) {
+            alert(`您选择了线路 ${routeNumber}！\n\n感谢您的选择，我们正在为您配置最佳连接...`);
+        }
+    </script>
+</body>
+</html>

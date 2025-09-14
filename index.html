@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML页面预览总览</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .password-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .password-title {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .password-input {
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            width: 300px;
+            max-width: 100%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .password-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .password-button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .password-button:hover {
+            background: linear-gradient(45deg, #2980b9, #1f4e79);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .password-error {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .categories {
+            display: grid;
+            gap: 40px;
+        }
+
+        .category {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .category-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .page-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .page-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: #3498db;
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .page-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .page-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .page-features li {
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .page-features li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+        }
+
+        .page-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 100%;
+        }
+
+        .page-link:hover {
+            background: linear-gradient(45deg, #2980b9, #1f4e79);
+            transform: scale(1.05);
+        }
+
+        .screenshot-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            border: 2px dashed #dee2e6;
+            color: #6c757d;
+            font-size: 0.9rem;
+            overflow: hidden;
+        }
+
+        .screenshot-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .screenshot-image:hover {
+            transform: scale(1.05);
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 40px;
+            color: white;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .pages-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">HTML页面预览总览</h1>
+            <p class="subtitle">探索各种炫酷的网页设计和交互效果</p>
+        </div>
+
+        <div class="stats">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">17</span>
+                    <span class="stat-label">总页面数</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">5</span>
+                    <span class="stat-label">炫酷效果</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">5</span>
+                    <span class="stat-label">表格样式</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">3</span>
+                    <span class="stat-label">布局设计</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="categories">
+            <!-- 炫酷效果页面 -->
+            <div class="category">
+                <h2 class="category-title">🎨 炫酷效果页面</h2>
+                <div class="pages-grid">
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/7ac66c0b4caf24aaf03a1d59531d9920.md.png" alt="霓虹发光效果截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">霓虹发光炫酷版</h3>
+                        <p class="page-description">采用霓虹灯风格的线路选择页面，具有炫酷的发光效果和动画</p>
+                        <ul class="page-features">
+                            <li>霓虹灯文字发光效果</li>
+                            <li>炫酷的动画过渡</li>
+                            <li>赛博朋克风格设计</li>
+                            <li>响应式布局</li>
+                        </ul>
+                        <a href="cool1-neon.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/c41411fc5c805f11f61be2e10f46b77a.md.png" alt="3D立体效果截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">3D立体炫酷版</h3>
+                        <p class="page-description">使用CSS 3D变换创建的立体视觉效果，带来沉浸式体验</p>
+                        <ul class="page-features">
+                            <li>3D立体变换效果</li>
+                            <li>浮动动画</li>
+                            <li>渐变背景</li>
+                            <li>现代UI设计</li>
+                        </ul>
+                        <a href="cool2-3d-unified.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/1af79ab827596d1c82ab4bd728225043.md.png" alt="粒子效果截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">粒子效果版</h3>
+                        <p class="page-description">动态粒子背景效果，营造科技感和未来感</p>
+                        <ul class="page-features">
+                            <li>动态粒子背景</li>
+                            <li>鼠标交互效果</li>
+                            <li>科技感设计</li>
+                            <li>流畅动画</li>
+                        </ul>
+                        <a href="cool3-particles.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/ffc0111e6d903ccf0739bd42ed9211dc.md.png" alt="全息投影效果截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">全息投影版</h3>
+                        <p class="page-description">模拟全息投影的视觉效果，具有科幻感</p>
+                        <ul class="page-features">
+                            <li>全息投影效果</li>
+                            <li>科幻风格设计</li>
+                            <li>动态光效</li>
+                            <li>未来感UI</li>
+                        </ul>
+                        <a href="cool4-hologram.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/75b09d15ed9f343a3bbe0665223e748f.md.png" alt="赛博朋克效果截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">赛博朋克版</h3>
+                        <p class="page-description">赛博朋克风格的页面设计，充满未来科技感</p>
+                        <ul class="page-features">
+                            <li>赛博朋克风格</li>
+                            <li>霓虹色彩搭配</li>
+                            <li>科技感元素</li>
+                            <li>炫酷动画</li>
+                        </ul>
+                        <a href="cool5-cyberpunk.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 表格样式页面 -->
+            <div class="category">
+                <h2 class="category-title">📊 表格样式页面</h2>
+                <div class="pages-grid">
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/fca101071668cd4be7e6d61cf7f914e5.md.png" alt="深色主题表格截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">深色主题表格</h3>
+                        <p class="page-description">优雅的深色主题表格设计，适合夜间使用</p>
+                        <ul class="page-features">
+                            <li>深色主题设计</li>
+                            <li>优雅的表格样式</li>
+                            <li>悬停效果</li>
+                            <li>现代化UI</li>
+                        </ul>
+                        <a href="table1-dark.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/bb23d9d8a80f4ed3ac69c8c81778a60e.md.png" alt="卡片式表格截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">卡片式表格</h3>
+                        <p class="page-description">采用卡片布局的表格设计，更加直观易读</p>
+                        <ul class="page-features">
+                            <li>卡片式布局</li>
+                            <li>清晰的信息层次</li>
+                            <li>响应式设计</li>
+                            <li>用户友好</li>
+                        </ul>
+                        <a href="table2-card.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/af34e180fcd51215f7357709565f6df5.md.png" alt="极简风格表格截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">极简风格表格</h3>
+                        <p class="page-description">简洁清爽的极简风格表格，注重内容展示</p>
+                        <ul class="page-features">
+                            <li>极简设计风格</li>
+                            <li>清爽的视觉效果</li>
+                            <li>内容优先</li>
+                            <li>简洁易读</li>
+                        </ul>
+                        <a href="table3-minimal.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/1049cbdfd6d9fd3a86fee8e58315c7a3.md.png" alt="彩色表格截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">彩色表格</h3>
+                        <p class="page-description">使用丰富色彩搭配的表格设计，更加生动有趣</p>
+                        <ul class="page-features">
+                            <li>丰富的色彩搭配</li>
+                            <li>生动的视觉效果</li>
+                            <li>色彩编码信息</li>
+                            <li>吸引眼球</li>
+                        </ul>
+                        <a href="table4-colorful.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/8b9d0d616d60ae87d779160762b8a3e4.md.png" alt="扁平化表格截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">扁平化表格</h3>
+                        <p class="page-description">现代扁平化设计风格的表格，简洁而美观</p>
+                        <ul class="page-features">
+                            <li>扁平化设计</li>
+                            <li>现代感十足</li>
+                            <li>简洁美观</li>
+                            <li>易于维护</li>
+                        </ul>
+                        <a href="table5-flat.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 布局设计页面 -->
+            <div class="category">
+                <h2 class="category-title">🏗️ 布局设计页面</h2>
+                <div class="pages-grid">
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/b3dca16733f7ae8e7702d6b300caaa22.md.png" alt="侧边栏布局截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">侧边栏导航布局</h3>
+                        <p class="page-description">经典的侧边栏导航布局，适合管理后台和复杂应用</p>
+                        <ul class="page-features">
+                            <li>固定侧边栏导航</li>
+                            <li>清晰的信息架构</li>
+                            <li>专业的管理界面</li>
+                            <li>良好的用户体验</li>
+                        </ul>
+                        <a href="layout2-sidebar.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/aa01483446a08af6c6c7c4024bea8328.md.png" alt="表格布局截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">表格布局</h3>
+                        <p class="page-description">专门为数据展示设计的表格布局页面</p>
+                        <ul class="page-features">
+                            <li>数据展示优化</li>
+                            <li>表格功能丰富</li>
+                            <li>专业的数据界面</li>
+                            <li>高效的信息展示</li>
+                        </ul>
+                        <a href="layout6-table.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/922889ec0345d7be44e1f527d1e9c917.md.png" alt="移动端优化截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">移动端优化</h3>
+                        <p class="page-description">专门为移动设备优化的响应式布局设计</p>
+                        <ul class="page-features">
+                            <li>移动端优先设计</li>
+                            <li>响应式布局</li>
+                            <li>触摸友好</li>
+                            <li>快速加载</li>
+                        </ul>
+                        <a href="mobile-optimized.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 样式主题页面 -->
+            <div class="category">
+                <h2 class="category-title">🎨 样式主题页面</h2>
+                <div class="pages-grid">
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/f634f9f6d21a54ef3a5c41e4b88198ba.md.png" alt="赛博朋克样式截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">赛博朋克样式</h3>
+                        <p class="page-description">赛博朋克风格的样式主题，充满未来科技感</p>
+                        <ul class="page-features">
+                            <li>赛博朋克美学</li>
+                            <li>霓虹色彩</li>
+                            <li>科技感元素</li>
+                            <li>未来主义设计</li>
+                        </ul>
+                        <a href="style2-cyberpunk.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/4c2208de89f1fedd06fea2982e298671.md.png" alt="深色金属样式截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">深色金属样式</h3>
+                        <p class="page-description">深色金属质感的样式主题，专业而优雅</p>
+                        <ul class="page-features">
+                            <li>金属质感设计</li>
+                            <li>深色主题</li>
+                            <li>专业外观</li>
+                            <li>优雅的视觉效果</li>
+                        </ul>
+                        <a href="style4-dark-metal.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/2131d51c4ae11fd4b0378cdbb0ba6675.md.png" alt="清新科技样式截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">清新科技样式</h3>
+                        <p class="page-description">清新明亮的科技风格样式主题</p>
+                        <ul class="page-features">
+                            <li>清新明亮的设计</li>
+                            <li>科技感元素</li>
+                            <li>现代UI风格</li>
+                            <li>用户友好</li>
+                        </ul>
+                        <a href="style5-fresh-tech.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+
+                    <div class="page-card">
+                        <div class="screenshot-placeholder">
+                             <img src="https://i.mji.rip/2025/09/13/9a0355c9aeefc35aa9c1ad8f68609f23.md.png" alt="其他页面截图" class="screenshot-image">
+                        </div>
+                        <h3 class="page-title">其他页面</h3>
+                        <p class="page-description">包含其他特殊设计的页面</p>
+                        <ul class="page-features">
+                            <li>特殊设计元素</li>
+                            <li>独特风格</li>
+                            <li>创新布局</li>
+                            <li>个性化设计</li>
+                        </ul>
+                        <a href="telet.html" class="page-link" target="_blank">查看页面</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 60px; color: white; opacity: 0.8;">
+            <p>💡 提示：点击任意页面链接即可查看完整效果</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">所有页面都支持响应式设计，可在不同设备上完美显示</p>
+        </div>
+    </div>
+</body>
+</html>

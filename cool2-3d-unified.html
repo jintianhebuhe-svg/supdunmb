@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线路选择 - 3D立体炫酷版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            perspective: 1000px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            transform-style: preserve-3d;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            transform: translateZ(50px);
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transform: rotateX(10deg);
+            animation: titleFloat 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleFloat {
+            0% { transform: rotateX(10deg) translateY(0px); }
+            100% { transform: rotateX(10deg) translateY(-10px); }
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            transform: rotateX(5deg);
+        }
+
+        .routes-table {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: rotateX(5deg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            padding: 25px;
+            text-align: center;
+            transform: translateZ(20px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .table-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .route-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 200px;
+            align-items: center;
+            padding: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .route-row:last-child {
+            border-bottom: none;
+        }
+
+        .route-row:hover {
+            transform: translateZ(20px) rotateX(5deg);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .route-number {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            transform: translateZ(10px);
+            animation: numberFloat 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes numberFloat {
+            0% { transform: translateZ(10px) rotateY(0deg); }
+            100% { transform: translateZ(15px) rotateY(5deg); }
+        }
+
+        .route-info {
+            padding-left: 25px;
+            transform: translateZ(5px);
+        }
+
+        .route-title {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .route-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        .route-actions {
+            text-align: right;
+            transform: translateZ(10px);
+        }
+
+        .route-button {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: translateZ(5px);
+        }
+
+        .route-button:hover {
+            transform: translateZ(10px) translateY(-3px);
+            box-shadow: 
+                0 12px 24px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .route-button:active {
+            transform: translateZ(5px) translateY(0px);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: rgba(255, 255, 255, 0.7);
+            transform: translateZ(20px);
+        }
+
+        /* 3D背景元素 */
+        .bg-element {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float3d 6s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .bg-element:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .bg-element:nth-child(2) {
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .bg-element:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float3d {
+            0%, 100% { 
+                transform: translateZ(0px) rotateY(0deg);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translateZ(50px) rotateY(180deg);
+                opacity: 0.7;
+            }
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            body {
+                perspective: none;
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .container {
+                padding: 8px;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                max-width: none;
+                margin: 0;
+                transform-style: flat;
+            }
+            
+            .header {
+                margin-bottom: 12px;
+                flex-shrink: 0;
+                transform: none;
+            }
+            
+            .title {
+                font-size: 1.6rem;
+                margin-bottom: 6px;
+                transform: none;
+                animation: none;
+            }
+            
+            .subtitle {
+                font-size: 0.85rem;
+                transform: none;
+            }
+            
+            .routes-table {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                background: transparent;
+                backdrop-filter: none;
+                border-radius: 0;
+                padding: 0;
+                transform: none;
+                box-shadow: none;
+                justify-content: space-between;
+                min-height: 0;
+                overflow: visible;
+                border: none;
+            }
+            
+            .table-header {
+                display: none;
+            }
+            
+            .route-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                text-align: left;
+                padding: 12px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                transform: none;
+                margin-bottom: 0;
+                flex: 1;
+                min-height: 60px;
+            }
+            
+            .route-row:hover {
+                transform: translateY(-1px);
+                background: rgba(255, 255, 255, 0.15);
+            }
+            
+            .route-info {
+                flex: 1;
+                padding-left: 0;
+                transform: none;
+            }
+            
+            .route-actions {
+                text-align: right;
+                transform: none;
+            }
+            
+            .route-button {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 0.9rem;
+                transform: none;
+                min-width: 70px;
+            }
+            
+            .route-button:hover {
+                transform: translateY(-1px);
+            }
+            
+            .route-number {
+                transform: none;
+                animation: none;
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+                flex-shrink: 0;
+            }
+            
+            .route-title {
+                font-size: 1rem;
+                margin-bottom: 2px;
+            }
+            
+            .route-description {
+                font-size: 0.8rem;
+            }
+            
+            .bg-element {
+                display: none;
+            }
+            
+            .footer {
+                margin-top: 8px;
+                font-size: 0.7rem;
+                transform: none;
+                flex-shrink: 0;
+            }
+        }
+
+        /* 超小屏幕优化 */
+        @media (max-width: 360px) {
+            .container {
+                padding: 6px;
+            }
+            
+            .title {
+                font-size: 1.4rem;
+            }
+            
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .routes-table {
+                gap: 5px;
+            }
+            
+            .route-row {
+                padding: 10px;
+                gap: 10px;
+                min-height: 55px;
+            }
+            
+            .route-number {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .route-title {
+                font-size: 0.9rem;
+            }
+            
+            .route-description {
+                font-size: 0.75rem;
+            }
+            
+            .route-button {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+                min-width: 60px;
+            }
+            
+            .footer {
+                margin-top: 6px;
+                font-size: 0.65rem;
+            }
+        }
+
+        /* 横屏优化 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                padding: 4px;
+            }
+            
+            .header {
+                margin-bottom: 6px;
+            }
+            
+            .title {
+                font-size: 1.2rem;
+                margin-bottom: 3px;
+            }
+            
+            .subtitle {
+                font-size: 0.75rem;
+            }
+            
+            .routes-table {
+                gap: 4px;
+            }
+            
+            .route-row {
+                padding: 8px;
+                gap: 8px;
+                min-height: 45px;
+            }
+            
+            .route-number {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            
+            .route-title {
+                font-size: 0.85rem;
+            }
+            
+            .route-description {
+                font-size: 0.7rem;
+            }
+            
+            .route-button {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+                min-width: 50px;
+            }
+            
+            .footer {
+                margin-top: 4px;
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-element"></div>
+    <div class="bg-element"></div>
+    <div class="bg-element"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">线路选择</h1>
+            <p class="subtitle">选择最适合您的连接线路</p>
+        </div>
+
+        <div class="routes-table">
+            <div class="table-header">
+                <h2 class="table-title">可用线路</h2>
+            </div>
+            
+            <div class="route-row" onclick="selectRoute(1)">
+                <div class="route-number">1</div>
+                <div class="route-info">
+                    <h3 class="route-title">线路一</h3>
+                    <p class="route-description">高速稳定，适合日常使用</p>
+                </div>
+                <div class="route-actions">
+                    <button class="route-button">选择</button>
+                </div>
+            </div>
+
+            <div class="route-row" onclick="selectRoute(2)">
+                <div class="route-number">2</div>
+                <div class="route-info">
+                    <h3 class="route-title">线路二</h3>
+                    <p class="route-description">专业级性能，适合商业用途</p>
+                </div>
+                <div class="route-actions">
+                    <button class="route-button">选择</button>
+                </div>
+            </div>
+
+            <div class="route-row" onclick="selectRoute(3)">
+                <div class="route-number">3</div>
+                <div class="route-info">
+                    <h3 class="route-title">线路三</h3>
+                    <p class="route-description">企业级解决方案，最高性能</p>
+                </div>
+                <div class="route-actions">
+                    <button class="route-button">选择</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 科技发布页. 所有权利保留.</p>
+        </div>
+    </div>
+
+    <script>
+        function selectRoute(routeNumber) {
+            // 添加触觉反馈（如果支持）
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            alert(`您选择了线路 ${routeNumber}！\n\n感谢您的选择，我们正在为您配置最佳连接...`);
+        }
+
+        // 防止双击缩放
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // 优化触摸体验
+        document.addEventListener('touchstart', function() {}, {passive: true});
+        document.addEventListener('touchmove', function() {}, {passive: true});
+    </script>
+</body>
+</html>

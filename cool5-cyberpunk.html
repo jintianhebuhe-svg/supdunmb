@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线路选择 - 赛博朋克炫酷版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #ff0080;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #ff0080;
+            margin-bottom: 20px;
+            text-shadow: 
+                0 0 10px #ff0080,
+                0 0 20px #ff0080,
+                0 0 30px #ff0080;
+            animation: cyberGlow 1s ease-in-out infinite alternate;
+            position: relative;
+        }
+
+        .title::after {
+            content: '>';
+            color: #00ffff;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes cyberGlow {
+            from { 
+                text-shadow: 
+                    0 0 10px #ff0080,
+                    0 0 20px #ff0080,
+                    0 0 30px #ff0080;
+            }
+            to { 
+                text-shadow: 
+                    0 0 20px #ff0080,
+                    0 0 30px #ff0080,
+                    0 0 40px #ff0080,
+                    0 0 50px #ff0080;
+            }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            animation: dataFlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes dataFlow {
+            from { opacity: 0.7; }
+            to { opacity: 1; }
+        }
+
+        .routes-table {
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #ff0080;
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: 
+                0 0 30px #ff0080,
+                inset 0 0 30px rgba(255, 0, 128, 0.1);
+            position: relative;
+        }
+
+        .routes-table::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 0, 128, 0.03) 10px,
+                    rgba(255, 0, 128, 0.03) 20px
+                );
+            pointer-events: none;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #ff0080, #00ffff, #ff0080);
+            background-size: 200% 200%;
+            animation: cyberGradient 3s ease infinite;
+            color: #000;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        @keyframes cyberGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .table-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            animation: cyberPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes cyberPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .route-row {
+            display: grid;
+            grid-template-columns: 100px 1fr 200px;
+            align-items: center;
+            padding: 25px 30px;
+            border-bottom: 2px solid #ff0080;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .route-row:last-child {
+            border-bottom: none;
+        }
+
+        .route-row::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 128, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .route-row:hover::before {
+            left: 100%;
+        }
+
+        .route-row:hover {
+            background: rgba(255, 0, 128, 0.1);
+            box-shadow: 0 0 30px rgba(255, 0, 128, 0.5);
+        }
+
+        .route-number {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #00ffff;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            box-shadow: 
+                0 0 15px #00ffff,
+                inset 0 0 15px rgba(0, 255, 255, 0.1);
+            animation: cyberRotate 4s linear infinite;
+        }
+
+        @keyframes cyberRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .route-info {
+            padding-left: 20px;
+        }
+
+        .route-title {
+            font-size: 1.4rem;
+            color: #ff0080;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff0080;
+            animation: cyberFlicker 0.1s infinite alternate;
+        }
+
+        @keyframes cyberFlicker {
+            0% { opacity: 1; }
+            100% { opacity: 0.9; }
+        }
+
+        .route-description {
+            color: #00ffff;
+            font-size: 1rem;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .route-actions {
+            text-align: right;
+        }
+
+        .route-button {
+            background: transparent;
+            color: #ff0080;
+            border: 2px solid #ff0080;
+            padding: 12px 25px;
+            border-radius: 0;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .route-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #ff0080;
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .route-button:hover::before {
+            left: 0;
+        }
+
+        .route-button:hover {
+            color: #000;
+            text-shadow: 0 0 10px #000;
+            box-shadow: 0 0 25px #ff0080;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: #666;
+            font-size: 0.9rem;
+            animation: cyberFade 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes cyberFade {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+
+        /* 赛博朋克装饰元素 */
+        .cyber-decoration {
+            position: fixed;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, #ff0080, transparent);
+            animation: cyberLine 2s ease-in-out infinite;
+        }
+
+        .cyber-decoration:nth-child(1) {
+            top: 20%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .cyber-decoration:nth-child(2) {
+            top: 40%;
+            right: 5%;
+            animation-delay: 1s;
+        }
+
+        .cyber-decoration:nth-child(3) {
+            bottom: 30%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        @keyframes cyberLine {
+            0%, 100% { opacity: 0.3; transform: scaleY(1); }
+            50% { opacity: 1; transform: scaleY(1.5); }
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            
+            .header {
+                margin-bottom: 20px;
+                flex-shrink: 0;
+            }
+            
+            .title {
+                font-size: 1.6rem;
+                margin-bottom: 10px;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .routes-table {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                background: rgba(0, 0, 0, 0.9);
+                border: 3px solid #ff0080;
+                border-radius: 15px;
+                padding: 15px;
+                box-shadow: 0 0 30px #ff0080;
+                justify-content: space-between;
+                min-height: 0;
+            }
+            
+            .table-header {
+                display: none;
+            }
+            
+            .route-row {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+                padding: 15px;
+                background: rgba(255, 0, 128, 0.05);
+                border: 2px solid #ff0080;
+                border-radius: 12px;
+                margin-bottom: 0;
+                flex: 1;
+            }
+            
+            .route-row:hover {
+                background: rgba(255, 0, 128, 0.1);
+                box-shadow: 0 0 20px #ff0080;
+            }
+            
+            .route-info {
+                padding-left: 0;
+            }
+            
+            .route-actions {
+                text-align: center;
+            }
+            
+            .route-button {
+                width: 100%;
+                padding: 12px;
+                font-size: 1rem;
+            }
+            
+            .route-number {
+                animation: cyberRotate 4s linear infinite;
+            }
+            
+            /* 隐藏装饰元素以提升性能 */
+            .cyber-decoration {
+                display: none;
+            }
+        }
+
+        /* 超小屏幕优化 */
+        @media (max-width: 360px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 1.4rem;
+            }
+            
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .routes-table {
+                padding: 12px;
+                gap: 8px;
+            }
+            
+            .route-row {
+                padding: 12px;
+            }
+            
+            .route-number {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+        }
+
+        /* 横屏优化 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                padding: 8px;
+            }
+            
+            .header {
+                margin-bottom: 8px;
+            }
+            
+            .title {
+                font-size: 1.2rem;
+                margin-bottom: 4px;
+            }
+            
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .routes-table {
+                gap: 6px;
+                padding: 12px;
+            }
+            
+            .route-row {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-decoration"></div>
+    <div class="cyber-decoration"></div>
+    <div class="cyber-decoration"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">线路选择</h1>
+            <p class="subtitle">选择最适合您的连接线路</p>
+        </div>
+
+        <div class="routes-table">
+            <div class="table-header">
+                <h2 class="table-title">可用线路</h2>
+            </div>
+            
+            <div class="route-row" onclick="selectRoute(1)">
+                <div class="route-number">1</div>
+                <div class="route-info">
+                    <h3 class="route-title">线路一</h3>
+                    <p class="route-description">高速稳定，适合日常使用</p>
+                </div>
+                <div class="route-actions">
+                    <button class="route-button">选择</button>
+                </div>
+            </div>
+
+            <div class="route-row" onclick="selectRoute(2)">
+                <div class="route-number">2</div>
+                <div class="route-info">
+                    <h3 class="route-title">线路二</h3>
+                    <p class="route-description">专业级性能，适合商业用途</p>
+                </div>
+                <div class="route-actions">
+                    <button class="route-button">选择</button>
+                </div>
+            </div>
+
+            <div class="route-row" onclick="selectRoute(3)">
+                <div class="route-number">3</div>
+                <div class="route-info">
+                    <h3 class="route-title">线路三</h3>
+                    <p class="route-description">企业级解决方案，最高性能</p>
+                </div>
+                <div class="route-actions">
+                    <button class="route-button">选择</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 科技发布页. 所有权利保留.</p>
+        </div>
+    </div>
+
+    <script>
+        function selectRoute(routeNumber) {
+            alert(`您选择了线路 ${routeNumber}！\n\n感谢您的选择，我们正在为您配置最佳连接...`);
+        }
+    </script>
+</body>
+</html>

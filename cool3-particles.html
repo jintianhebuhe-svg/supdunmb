@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线路选择 - 粒子动画炫酷版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ffff;
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) translateX(10px) scale(1);
+            }
+            90% {
+                opacity: 1;
+                transform: translateY(10vh) translateX(-10px) scale(1);
+            }
+            100% {
+                transform: translateY(-10vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #00ffff;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { 
+                text-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff;
+            }
+            to { 
+                text-shadow: 0 0 30px #00ffff, 0 0 40px #00ffff, 0 0 50px #00ffff;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #888;
+            animation: fadeInOut 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes fadeInOut {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
+        }
+
+        .routes-table {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #ff00ff, #00ffff);
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .table-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .table-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #000;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .route-row {
+            display: grid;
+            grid-template-columns: 100px 1fr 200px;
+            align-items: center;
+            padding: 30px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .route-row:last-child {
+            border-bottom: none;
+        }
+
+        .route-row::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .route-row:hover::before {
+            transform: translateX(100%);
+        }
+
+        .route-row:hover {
+            background: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .route-number {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #00ffff, #0080ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000;
+            box-shadow: 
+                0 0 20px #00ffff,
+                inset 0 0 20px rgba(255, 255, 255, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 20px #00ffff;
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 30px #00ffff, 0 0 40px #00ffff;
+            }
+        }
+
+        .route-info {
+            padding-left: 25px;
+        }
+
+        .route-title {
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .route-description {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .route-actions {
+            text-align: right;
+        }
+
+        .route-button {
+            background: transparent;
+            color: #00ffff;
+            border: 2px solid #00ffff;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .route-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #00ffff;
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .route-button:hover::before {
+            left: 0;
+        }
+
+        .route-button:hover {
+            color: #000;
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            
+            .header {
+                margin-bottom: 20px;
+                flex-shrink: 0;
+            }
+            
+            .title {
+                font-size: 1.6rem;
+                margin-bottom: 10px;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .routes-table {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(0, 255, 255, 0.3);
+                border-radius: 15px;
+                padding: 15px;
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+                justify-content: space-between;
+                min-height: 0;
+            }
+            
+            .table-header {
+                display: none;
+            }
+            
+            .route-row {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+                padding: 15px;
+                background: rgba(0, 255, 255, 0.05);
+                border: 1px solid rgba(0, 255, 255, 0.2);
+                border-radius: 12px;
+                margin-bottom: 0;
+                flex: 1;
+            }
+            
+            .route-row:hover {
+                background: rgba(0, 255, 255, 0.1);
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            }
+            
+            .route-info {
+                padding-left: 0;
+            }
+            
+            .route-actions {
+                text-align: center;
+            }
+            
+            .route-button {
+                width: 100%;
+                padding: 12px;
+                font-size: 1rem;
+            }
+            
+            .route-number {
+                animation: pulse 2s ease-in-out infinite;
+            }
+            
+            /* 减少粒子数量以提升性能 */
+            .particle {
+                animation-duration: 20s;
+            }
+        }
+
+        /* 超小屏幕优化 */
+        @media (max-width: 360px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 1.4rem;
+            }
+            
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .routes-table {
+                padding: 12px;
+                gap: 8px;
+            }
+            
+            .route-row {
+                padding: 12px;
+            }
+            
+            .route-number {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+        }
+
+        /* 横屏优化 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                padding: 8px;
+            }
+            
+            .header {
+                margin-bottom: 8px;
+            }
+            
+            .title {
+                font-size: 1.2rem;
+                margin-bottom: 4px;
+            }
+            
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .routes-table {
+                gap: 6px;
+                padding: 12px;
+            }
+            
+            .route-row {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles-container" id="particles"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">线路选择</h1>
+            <p class="subtitle">选择最适合您的连接线路</p>
+        </div>
+
+        <div class="routes-table">
+            <div class="table-header">
+                <h2 class="table-title">可用线路</h2>
+            </div>
+            
+            <div class="route-row" onclick="selectRoute(1)">
+                <div class="route-number">1</div>
+                <div class="route-info">
+                    <h3 class="route-title">线路一</h3>
+                    <p class="route-description">高速稳定，适合日常使用</p>
+                </div>
+                <div class="route-actions">
+                    <button class="route-button">选择</button>
+                </div>
+            </div>
+
+            <div class="route-row" onclick="selectRoute(2)">
+                <div class="route-number">2</div>
+                <div class="route-info">
+                    <h3 class="route-title">线路二</h3>
+                    <p class="route-description">专业级性能，适合商业用途</p>
+                </div>
+                <div class="route-actions">
+                    <button class="route-button">选择</button>
+                </div>
+            </div>
+
+            <div class="route-row" onclick="selectRoute(3)">
+                <div class="route-number">3</div>
+                <div class="route-info">
+                    <h3 class="route-title">线路三</h3>
+                    <p class="route-description">企业级解决方案，最高性能</p>
+                </div>
+                <div class="route-actions">
+                    <button class="route-button">选择</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 科技发布页. 所有权利保留.</p>
+        </div>
+    </div>
+
+    <script>
+        // 创建粒子效果
+        function createParticles() {
+            const container = document.getElementById('particles');
+            // 移动端减少粒子数量以提升性能
+            const isMobile = window.innerWidth <= 768;
+            const particleCount = isMobile ? 30 : 100;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        function selectRoute(routeNumber) {
+            alert(`您选择了线路 ${routeNumber}！\n\n感谢您的选择，我们正在为您配置最佳连接...`);
+        }
+
+        // 页面加载完成后创建粒子
+        window.addEventListener('load', createParticles);
+    </script>
+</body>
+</html>
